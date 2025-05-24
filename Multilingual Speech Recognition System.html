@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>English to Multilingual Translator</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            background: url('https://imgs.search.brave.com/cpiPcmy-v4W6QOG6u7N_w8sdi08oe0Kb3LKAB17ofdY/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly93YWxs/cGFwZXJhY2Nlc3Mu/Y29tL2Z1bGwvMTEz/NDkwNS5wbmc') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .container {
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.75);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.6);
+            color: #fff;
+            backdrop-filter: blur(8px);
+        }
+
+        h2 {
+            color: #00ffea;
+            text-shadow: 0 0 10px #00ffff;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-size: 18px;
+            color: #00ccff;
+            margin-right: 15px;
+            text-shadow: 0 0 5px #00ccff;
+        }
+
+        select {
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid #00ffff;
+            background-color: #111;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            border: none;
+            background-color: #0099ff;
+            color: #fff;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 0 15px #00c3ff;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #007acc;
+            box-shadow: 0 0 20px #00b3ff;
+        }
+
+        p {
+            font-size: 20px;
+            margin: 10px 0;
+            color: #ffee58;
+            text-shadow: 0 0 5px #ffee58;
+        }
+
+        strong {
+            color: #00e5ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🎙️ Speak in English, see in multiple languages</h2>
+        <label for="targetLanguage">Translate to:</label>
+        <select id="targetLanguage">
+            <option value="ta">Tamil</option>
+            <option value="hi">Hindi</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+            <option value="es">Spanish</option>
+        </select>
+        <br />
+        <button onclick="startRecognition()">Start Speaking</button>
+        <p><strong>English:</strong> <span id="englishText"></span></p>
+        <p><strong>Translation:</strong> <span id="translatedText"></span></p>
+    </div>
+
+    <script>
+        const englishSpan = document.getElementById('englishText');
+        const translatedSpan = document.getElementById('translatedText');
+        const languageSelect = document.getElementById('targetLanguage');
+
+        function startRecognition() {
+            const recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'en-US';
+            recognition.start();
+
+            recognition.onresult = function(event) {
+                const text = event.results[0][0].transcript;
+                englishSpan.textContent = text;
+                translateText(text, languageSelect.value);
+            };
+        }
+
+        function translateText(text, targetLang) {
+            const translateUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
+            fetch(translateUrl)
+                .then(res => res.json())
+                .then(data => {
+                    const translation = data[0][0][0];
+                    translatedSpan.textContent = translation;
+                })
+                .catch(err => {
+                    translatedSpan.textContent = "Translation failed.";
+                    console.error(err);
+                });
+        }
+    </script>
+</body>
+</html>
